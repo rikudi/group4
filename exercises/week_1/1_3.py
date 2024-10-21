@@ -3,7 +3,7 @@ from ssd1306 import SSD1306_I2C
 import time
 
 # Initialize I2C with the common pins for Raspberry Pi Pico
-i2c = I2C(1, sda=Pin(14), scl=Pin(15))
+i2c = I2C(1, sda=Pin(14), scl=Pin(15), freq=400000)
 
 # Init oled screen
 oled = SSD1306_I2C(128, 64, i2c)
