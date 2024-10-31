@@ -1,0 +1,3 @@
+[submodule "exercises/week_2/exercises/week_2/2_3/pico-lib"]
+	path = exercises/week_2/exercises/week_2/2_3/pico-lib
+	url = https://github.com/rikudi/group4.git
