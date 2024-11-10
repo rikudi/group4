@@ -1,3 +1,14 @@
+''' 
+[Exercise 3.3: Display data from a file on the OLED display]
+
+128 pixels drawn on screen. Each pixel represents a value from the data file.
+The data file used is capture_250hz_01.txt.
+Scroll through the data using the rotary encoder.
+
+Min-max values are displayed at the top of the screen.
+Value of the current data point is displayed on the left side of the screen.
+ '''
+
 from machine import Pin, I2C
 import time
 from fifo import Fifo
