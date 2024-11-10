@@ -88,7 +88,7 @@ def display_data():
             
             # Draw the current value text aligned with the index pixel
             text_y_pos = max(header_height, min(y_pos, 64 - 10))  # Ensure the text stays within the display height
-            oled.text(str(value), 0, text_y_pos, 1)
+            oled.text(str(int(value)), 0, text_y_pos, 1)
     
     oled.show()
 
