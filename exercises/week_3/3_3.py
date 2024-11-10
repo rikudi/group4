@@ -18,7 +18,7 @@ encoder_fifo = Fifo(32)
 data_list = []
 
 '''FILE TO READ'''
-filename = 'capture_250hz_011.txt'
+filename = 'capture_250hz_01.txt'
 print(f"Reading {filename}...")
 try:
     file_fifo = Filefifo(32, name=filename, repeat=False)
