@@ -2,6 +2,8 @@ from machine import Pin, I2C, ADC, PWM
 from piotimer import Piotimer as Timer
 from ssd1306 import SSD1306_I2C 
 from fifo import Fifo
+import os
+from dotenv import load_dotenv
 import urequests as requests
 import ujson
 import network
@@ -33,6 +35,9 @@ samplerate = 250
 samples = Fifo(50)
 
 # Menu selevtion variables and switch filtering
+mode = 0
+count = 0
+switch_state = 0
 current_selection = 0
 
 last_button_time = 0
@@ -43,21 +48,33 @@ menu_items = ["MEASURE HR", "HRV ANALYSIS", "KUBIOS", "HISTORY"]
 max_history = 250
 history = []
 
-<<<<<<< HEAD
-'''
-#SSID credentials
-ssid = ""
-password = "Takapenkinpojat1234"
-'''
-=======
 # Load environment variables
 load_dotenv()
->>>>>>> b9a9201578f8d4d25d3daba15bf8c01c9fc7423f
 
-# Kuios credentials
-APIKEY = ""
-CLIENT_ID =""
-CLIENT_SECRET = ""
+def load_env(file_path=".env"):
+    env_vars = {}
+    try:
+        with open(file_path, "r") as file:
+            for line in file:
+                # Ignore comments and empty lines
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    key, value = line.split("=", 1)
+                    env_vars[key.strip()] = value.strip()
+        return env_vars
+    except Exception as e:
+        print(f"Error loading .env file: {e}")
+        return {}
+
+# Load environment variables
+env_vars = load_env()
+
+# Access variables
+APIKEY = env_vars.get("APIKEY")
+CLIENT_ID = env_vars.get("CLIENT_ID")
+CLIENT_SECRET = env_vars.get("CLIENT_SECRET")
+
+load_env()
 
 LOGIN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/login"
 TOKEN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/oauth2/token"
@@ -82,6 +99,7 @@ def encoder_turn_callback(pin):
 def connect():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
+    wlan.connect(ssid, password)
     ip = wlan.ifconfig()[0]
     return ip
 
@@ -319,3 +337,6 @@ while True:
             display_menu()
     
     time.sleep(0.01)
+
+
+
