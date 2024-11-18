@@ -10,6 +10,8 @@ import array
 import time
 import socket
 
+# test estestset
+
 
 #ADC-converter
 adc = ADC(26)
