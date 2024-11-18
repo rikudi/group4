@@ -20,6 +20,17 @@ adc = ADC(26)
 i2c = I2C(1, sda=Pin(14), scl=Pin(15))
 oled = SSD1306_I2C(128, 64, i2c)
 
+# nää mitat on nyt 2 kertaa täällä, ilmotettu jo tossa oledissä yläpuolella,
+#update_graph käyttää näil nimillä, muutellaan myöhemmin
+# Constants for the OLED graph
+GRAPH_WIDTH = 128
+GRAPH_HEIGHT = 32  # Height of the graph area
+GRAPH_TOP = 16  # Vertical offset for the graph
+GRAPH_BUFFER_SIZE = GRAPH_WIDTH  # Buffer size matches the width of the display
+
+# Buffer to store ADC values for the graph
+graph_buffer = [0] * GRAPH_BUFFER_SIZE  # Pre-fill with zeros
+
 #LEDs
 led_onboard = Pin("LED", Pin.OUT)
 led21 = PWM(Pin(21))
@@ -34,10 +45,7 @@ rot_push = Pin(12, Pin.IN, Pin.PULL_UP)
 samplerate = 250
 samples = Fifo(50)
 
-# Menu selevtion variables and switch filtering
-mode = 0
-count = 0
-switch_state = 0
+# Menu selection variables
 current_selection = 0
 
 last_button_time = 0
@@ -48,9 +56,12 @@ menu_items = ["MEASURE HR", "HRV ANALYSIS", "KUBIOS", "HISTORY"]
 max_history = 250
 history = []
 
+# ei käytössä
+PPI_array = []
 # Load environment variables
 load_dotenv()
 
+# Reads .env file manually
 def load_env(file_path=".env"):
     env_vars = {}
     try:
@@ -81,6 +92,37 @@ TOKEN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/oauth2/token"
 REDIRECT_URI = "https://analysis.kubioscloud.com/v1/portal/login"
 
 
+ppi_data = []  # Initialize PPI data buffer
+
+# Function to collect PPI data dynamically
+def collect_ppi_data(duration=10):
+    global ppi_data
+    start_time = time.ticks_ms()
+    ppi_data = []  # Clear existing data
+    while time.ticks_diff(time.ticks_ms(), start_time) < duration * 1000:  # Collect data for `duration` seconds
+        ppi_data.append(adc.read_u16())
+        time.sleep(0.1)
+        
+def create_kubios_dataset(ppi_data):
+    return {
+        "type": "RR",
+        "data": ppi_data,
+        "analysis_type": "readiness"  # Adjust this to your desired analysis type
+    }
+
+#Ei käytössä vielä missään
+def send_kubios_request(dataset, access_token):
+    response = requests.post(
+        url="https://analysis.kubioscloud.com/v1/analysis/readiness",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "X-Api-Key": APIKEY
+        },
+        json=dataset
+    )
+    return response.json()
+
+#Ei käytössä vielä missään
 # Signal reading function
 def read_adc(tid):
     x = adc.read_u16()
@@ -96,6 +138,7 @@ def encoder_turn_callback(pin):
     except RuntimeError:
         pass
     
+#Ei käytössä vielä
 def connect():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
@@ -150,7 +193,7 @@ def RMSSD_calculator(data):
     rounded_RMSSD = round((summary/(len(data)-1))**(1/2), 0)
     return int(rounded_RMSSD)
 
-
+# Ei käytössä vielä
 # SDSD Calculator
 def SDSD_calculator(data):
     PP_array = array.array('l')
@@ -170,11 +213,13 @@ def SDSD_calculator(data):
     rounded_SDSD = round((first - second)**(1/2), 0)
     return int(rounded_SDSD)
 
+# Ei käytössä vielä
 # SD1 Calculator
 def SD1_calculator(SDSD):
     rounded_SD1 = round(((SDSD**2)/2)**(1/2), 0)
     return int(rounded_SD1)
 
+# Ei käytössä vielä
 # SD2 Calculator
 def SD2_calculator(SDNN, SDSD):
     rounded_SD2 = round(((2*(SDNN**2))-((SDSD**2)/2))**(1/2), 0)
@@ -188,12 +233,50 @@ def display_history():
     oled.text("HISTORY", 0, 0, 1)
     
     # Display 5 items from history
-    for i, item in enumerate(history[-5:]): # show last 5
+    for i, item in enumerate(history[-4:]): # show last 4
         y_pos = (i + 1) * 12 # Adjust vertical spacing
         oled.text(f"{i + 1}: {item}", 0, y_pos, 1) # Display history item
         
     oled.show()
+    
+    #Tää paska ei toimi
+'''
+def get_kubios_token():
+    response = requests.post(
+        url=TOKEN_URL,
+        data={
+            "grant_type": "client_credentials",
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"}
+    )
+    response_data = response.json()
+    return response_data["access_token"]
+'''
 
+# Function to update the graph
+def update_graph(adc_value):
+    global graph_buffer
+
+    # Scale ADC value to fit graph height
+    scaled_value = int((adc_value / 65535) * GRAPH_HEIGHT)
+
+    # Update buffer (FIFO behavior)
+    graph_buffer.pop(0)  # Remove oldest value
+    graph_buffer.append(scaled_value)  # Add new value
+
+    # Clear the graph area
+    oled.fill_rect(0, GRAPH_TOP, GRAPH_WIDTH, GRAPH_HEIGHT, 0)
+
+    # Draw the graph line
+    for x in range(1, len(graph_buffer)):
+        oled.line(
+            x - 1, GRAPH_TOP + GRAPH_HEIGHT - graph_buffer[x - 1],  # Start point
+            x, GRAPH_TOP + GRAPH_HEIGHT - graph_buffer[x],  # End point
+            1  # Color (white)
+        )
+    oled.show()
 
 def display_menu():
     oled.fill(0) # Clear display
@@ -258,72 +341,105 @@ while True:
             led_onboard.value(0)
             
             if current_selection == 0:  # "MEASURE HR"
-                ppi_data = [828, 836, 852, 760, 800]  # Replace with real PPI data
-                mean_ppi = meanPPI_calculator(ppi_data)
-                hr = meanHR_calculator(mean_ppi)  # Calculate HR
-                history.append(f"HR: {hr} BPM")  # Add result to history
-                
-                # Limit the history size
-                if len(history) > max_history:
-                    history.pop(0)  # Remove the oldest entry
-
-                # Display the result on OLED (example display)
                 oled.fill(0)
-                oled.text("MEASURED HR:", 0, 0)
-                oled.text(f"{hr} BPM", 0, 16)
+                oled.text("Real-time HR", 0, 0)
+                oled.text("Press to stop", 0, 8)
                 oled.show()
-                time.sleep(2)
-                display_menu()  # Return to menu
-                
+
+                start_time = time.ticks_ms()
+                while True:
+                    # Read ADC value
+                    adc_value = adc.read_u16()
+
+                    # Update the real-time graph
+                    update_graph(adc_value)
+
+                    # Exit on button press
+                    if not samples.empty():
+                        event = samples.get()
+                        if event == 2:  # Button pressed
+                            break
+
+                    # Limit the sampling rate (optional, adjust as needed)
+                    time.sleep(0.01)
+
+                display_menu()
+
             if current_selection == 1:  # "HRV ANALYSIS"
-                ppi_data = [828, 836, 852, 760, 800]  # Replace with real PPI data
+                oled.fill(0)
+                oled.text("Collecting data...", 0, 0)
+                oled.show()
+                collect_ppi_data()  # Collect dynamic PPI data
+
                 mean_ppi = meanPPI_calculator(ppi_data)
                 sdnn = SDNN_calculator(ppi_data, mean_ppi)
                 rmssd = RMSSD_calculator(ppi_data)
 
-                # Add results to history
                 history.append(f"SDNN: {sdnn} ms")
                 history.append(f"RMSSD: {rmssd} ms")
-
-                # Limit the history size
-                while len(history) > max_history:
+                if len(history) > max_history:
                     history.pop(0)
 
-                # Display results on OLED (example display)
                 oled.fill(0)
                 oled.text("HRV ANALYSIS:", 0, 0)
                 oled.text(f"SDNN: {sdnn} ms", 0, 16)
                 oled.text(f"RMSSD: {rmssd} ms", 0, 32)
                 oled.show()
                 time.sleep(2)
-                display_menu()  # Return to menu
-                
-            if current_selection == 2:  # "KUBIOS" 
-                intervals = [828, 836, 852, 760, 800]  # Replace with real interval data
+                display_menu()
 
-                # Example of response parsing (mock API result)
-                sns = 0.65  # Replace with actual API response value
-                pns = 0.35  # Replace with actual API response value
                 
-                # Add results to history
-                history.append(f"SNS: {sns}")
-                history.append(f"PNS: {pns}")
-                
-                # Limit history size
-                while len(history) > max_history:
-                    history.pop(0)
-
-                # Display results on OLED
+            if current_selection == 2:  # "KUBIOS"
                 oled.fill(0)
-                oled.text("KUBIOS RESULTS:", 0, 0)
-                oled.text(f"SNS: {sns}", 0, 16)
-                oled.text(f"PNS: {pns}", 0, 32)
+                oled.text("Collecting data...", 0, 0)
                 oled.show()
-                time.sleep(2)
-                display_menu()  # Return to menu
+                collect_ppi_data()  # Collect dynamic PPI data
+
+                dataset = create_kubios_dataset(ppi_data)
+                
+                # Pitää selvittää miks tää antaa errorin
+                try:
+                    response = requests.post(
+                        url="https://analysis.kubioscloud.com/v1/analysis/readiness",
+                        headers={
+                            "Authorization": f"Bearer {access_token}",
+                            "X-Api-Key": APIKEY
+                        },
+                        json=dataset
+                    )
+                    analysis_result = response.json()
+
+                    # Extract results (example)
+                    sns = analysis_result.get("sns", "N/A")
+                    pns = analysis_result.get("pns", "N/A")
+
+                    # Add results to history
+                    history.append(f"SNS: {sns}")
+                    history.append(f"PNS: {pns}")
+                    if len(history) > max_history:
+                        history.pop(0)
+
+                    # Display results
+                    oled.fill(0)
+                    oled.text("KUBIOS RESULTS:", 0, 0)
+                    oled.text(f"SNS: {sns}", 0, 16)
+                    oled.text(f"PNS: {pns}", 0, 32)
+                    oled.show()
+                    time.sleep(2)
+
+                except Exception as e:
+                    oled.fill(0)
+                    oled.text("API ERROR", 0, 0)
+                    oled.text(str(e), 0, 16)
+                    oled.show()
+                    time.sleep(2)
+
+                display_menu()
+
             
             if current_selection == len(menu_items) - 1: # if history is selected
                 display_history()
+                
                 # Return menu
                 while True:
                     if not samples.empty():
