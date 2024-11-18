@@ -33,9 +33,6 @@ samplerate = 250
 samples = Fifo(50)
 
 # Menu selevtion variables and switch filtering
-mode = 0
-count = 0
-switch_state = 0
 current_selection = 0
 
 last_button_time = 0
@@ -317,5 +314,3 @@ while True:
             display_menu()
     
     time.sleep(0.01)
-
-#kokeilu
