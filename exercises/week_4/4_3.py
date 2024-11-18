@@ -24,7 +24,7 @@ offset = 0.0
 
 def read_data():
     global data_list
-    filename = 'capture_250hz_01.txt'
+    filename = 'capture_250Hz_01.txt'
     print(f"Reading {filename}...")
     try:
         file_fifo = Filefifo(32, name=filename, repeat=False)
