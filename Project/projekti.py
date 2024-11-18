@@ -43,11 +43,16 @@ menu_items = ["MEASURE HR", "HRV ANALYSIS", "KUBIOS", "HISTORY"]
 max_history = 250
 history = []
 
+<<<<<<< HEAD
 '''
 #SSID credentials
 ssid = ""
 password = "Takapenkinpojat1234"
 '''
+=======
+# Load environment variables
+load_dotenv()
+>>>>>>> b9a9201578f8d4d25d3daba15bf8c01c9fc7423f
 
 # Kuios credentials
 APIKEY = ""
