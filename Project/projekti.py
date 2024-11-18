@@ -2,6 +2,8 @@ from machine import Pin, I2C, ADC, PWM
 from piotimer import Piotimer as Timer
 from ssd1306 import SSD1306_I2C 
 from fifo import Fifo
+import os
+from dotenv import load_dotenv
 import urequests as requests
 import ujson
 import network
@@ -43,16 +45,13 @@ DEBOUNCE_MS = 500
 
 menu_items = ["MEASURE HR", "HRV ANALYSIS", "KUBIOS", "HISTORY"]
 
-'''
-#SSID credentials
-ssid = ""
-password = "Takapenkinpojat1234"
-'''
+# Load environment variables
+load_dotenv()
 
 # Kuios credentials
-APIKEY = ""
-CLIENT_ID =""
-CLIENT_SECRET = ""
+APIKEY = os.getenv('APIKEY')
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 
 LOGIN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/login"
 TOKEN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/oauth2/token"
