@@ -51,10 +51,30 @@ history = []
 # Load environment variables
 load_dotenv()
 
-# Kuios credentials
-APIKEY = os.getenv('APIKEY')
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+def load_env(file_path=".env"):
+    env_vars = {}
+    try:
+        with open(file_path, "r") as file:
+            for line in file:
+                # Ignore comments and empty lines
+                line = line.strip()
+                if line and not line.startswith("#"):
+                    key, value = line.split("=", 1)
+                    env_vars[key.strip()] = value.strip()
+        return env_vars
+    except Exception as e:
+        print(f"Error loading .env file: {e}")
+        return {}
+
+# Load environment variables
+env_vars = load_env()
+
+# Access variables
+APIKEY = env_vars.get("APIKEY")
+CLIENT_ID = env_vars.get("CLIENT_ID")
+CLIENT_SECRET = env_vars.get("CLIENT_SECRET")
+
+load_env()
 
 LOGIN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/login"
 TOKEN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/oauth2/token"
@@ -79,6 +99,7 @@ def encoder_turn_callback(pin):
 def connect():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
+    wlan.connect(ssid, password)
     ip = wlan.ifconfig()[0]
     return ip
 
