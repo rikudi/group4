@@ -206,11 +206,11 @@ while True:
         event = samples.get()
     
         if event == 0:
-            current_selection = (current_selection -1) % len(menu_items)
+            current_selection = (current_selection +1) % len(menu_items)
             display_menu()
             
         elif event == 1:
-            current_selection = (current_selection +1) % len(menu_items)
+            current_selection = (current_selection -1) % len(menu_items)
             display_menu()
         
         elif event == 2:
