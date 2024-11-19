@@ -65,6 +65,8 @@ LOGIN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/login"
 TOKEN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/oauth2/token"
 REDIRECT_URI = "https://analysis.kubioscloud.com/v1/portal/login"
 
+ssid = "KME751_Group_4"
+password = "takapenkinpojat"
 
 ppi_data = []  # Initialize PPI data buffer
 
@@ -102,6 +104,7 @@ def read_adc(tid):
     x = adc.read_u16()
     samples.put(x)
 
+tmr = Timer(freq = samplerate, callback = read_adc)
 
 def encoder_turn_callback(pin):
     try:
@@ -318,6 +321,7 @@ while True:
                 oled.fill(0)
                 oled.text("Real-time HR", 0, 0)
                 oled.text("Press to stop", 0, 8)
+                tmr.deinit()
                 oled.show()
 
                 start_time = time.ticks_ms()
