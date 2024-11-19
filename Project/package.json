@@ -1,11 +1,9 @@
 {
   "urls": [
     ["projekti.py", "http://localhost:8000/projekti.py"],
-    [".env", "http://localhost:8000/.env"],
     ["lib/fifo.py", "http://localhost:8000/lib/fifo.py"],
     ["lib/piotimer.py", "http://localhost:8000/lib/piotimer.py"],
     ["lib/ssd1306.mpy", "http://localhost:8000/lib/ssd1306.mpy"],
-    ["lib/dotenv.py", "http://localhost:8000/lib/dotenv.py"],
     ["lib/led.py", "http://localhost:8000/lib/led.py"]
   ],
   "deps": [],
