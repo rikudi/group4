@@ -2,8 +2,6 @@ from machine import Pin, I2C, ADC, PWM
 from piotimer import Piotimer as Timer
 from ssd1306 import SSD1306_I2C 
 from fifo import Fifo
-import os
-from dotenv import load_dotenv
 import urequests as requests
 import ujson
 import network
@@ -58,34 +56,10 @@ history = []
 
 # ei käytössä
 PPI_array = []
-# Load environment variables
-load_dotenv()
 
-# Reads .env file manually
-def load_env(file_path=".env"):
-    env_vars = {}
-    try:
-        with open(file_path, "r") as file:
-            for line in file:
-                # Ignore comments and empty lines
-                line = line.strip()
-                if line and not line.startswith("#"):
-                    key, value = line.split("=", 1)
-                    env_vars[key.strip()] = value.strip()
-        return env_vars
-    except Exception as e:
-        print(f"Error loading .env file: {e}")
-        return {}
-
-# Load environment variables
-env_vars = load_env()
-
-# Access variables
-APIKEY = env_vars.get("APIKEY")
-CLIENT_ID = env_vars.get("CLIENT_ID")
-CLIENT_SECRET = env_vars.get("CLIENT_SECRET")
-
-load_env()
+APIKEY = "pbZRUi49X48I56oL1Lq8y8NDjq6rPfzX3AQeNo3a"
+CLIENT_ID = "3pjgjdmamlj759te85icf0lucv"
+CLIENT_SECRET = "111fqsli1eo7mejcrlffbklvftcnfl4keoadrdv1o45vt9pndlef" 
 
 LOGIN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/login"
 TOKEN_URL = "https://kubioscloud.auth.eu-west-1.amazoncognito.com/oauth2/token"
@@ -234,7 +208,7 @@ def display_history():
     
     # Display 5 items from history
     for i, item in enumerate(history[-4:]): # show last 4
-        y_pos = (i + 1) * 12 # Adjust vertical spacing
+        y_pos = (i + 1) * 8 # Adjust vertical spacing
         oled.text(f"{i + 1}: {item}", 0, y_pos, 1) # Display history item
         
     oled.show()
