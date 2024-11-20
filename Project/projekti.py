@@ -14,15 +14,16 @@ import socket
 #ADC-converter
 adc = ADC(26)
 
+OLED_WIDTH = 128
+OLED_HEIGHT = 64
+
 #Initialize I2C and OLED
 i2c = I2C(1, sda=Pin(14), scl=Pin(15))
-oled = SSD1306_I2C(128, 64, i2c)
+oled = SSD1306_I2C(OLED_WIDTH, OLED_HEIGHT, i2c)
 
-# nää mitat on nyt 2 kertaa täällä, ilmotettu jo tossa oledissä yläpuolella,
-#update_graph käyttää näil nimillä, muutellaan myöhemmin
 # Constants for the OLED graph
-GRAPH_WIDTH = 128
-GRAPH_HEIGHT = 32  # Height of the graph area
+GRAPH_WIDTH = OLED_WIDTH
+GRAPH_HEIGHT = OLED_HEIGHT  # Height of the graph area
 GRAPH_TOP = 16  # Vertical offset for the graph
 GRAPH_BUFFER_SIZE = GRAPH_WIDTH  # Buffer size matches the width of the display
 
@@ -216,7 +217,7 @@ def display_history():
         
     oled.show()
     
-    #Tää paska ei toimi
+    #Tää paska ei toimi vissii
 '''
 def get_kubios_token():
     response = requests.post(
@@ -431,6 +432,5 @@ while True:
             display_menu()
     
     time.sleep(0.01)
-
 
 
