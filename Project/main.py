@@ -2,9 +2,9 @@ from machine import Pin, ADC, PWM
 from piotimer import Piotimer as Timer
 from fifo import Fifo
 import time
-from kubios_mqtt import KubiosMQTT
-from display_manager import DisplayManager
-from hrv_analyzer import HRVAnalyzer
+from modules.kubios_mqtt import KubiosMQTT
+from modules.display_manager import DisplayManager
+from modules.hrv_analyzer import HRVAnalyzer
 
 # Initialize hardware
 adc = ADC(26)

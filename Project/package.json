@@ -5,9 +5,9 @@
     ["lib/piotimer.py", "http://localhost:8000/lib/piotimer.py"],
     ["lib/ssd1306.mpy", "http://localhost:8000/lib/ssd1306.mpy"],
     ["lib/led.py", "http://localhost:8000/lib/led.py"],
-    ["kubios_mqtt.py", "http://localhost:8000/kubios_mqtt.py"],
-    ["hrv_analyzer.py", "http://localhost:8000/hrv_analyzer.py"],
-    ["display_manager.py", "http://localhost:8000/display_manager.py"]
+    ["modules/kubios_mqtt.py", "http://localhost:8000/modules/kubios_mqtt.py"],
+    ["modules/hrv_analyzer.py", "http://localhost:8000/modules/hrv_analyzer.py"],
+    ["modules/display_manager.py", "http://localhost:8000/modules/display_manager.py"]
   ],
   "deps": [],
   "version": "0.1"
