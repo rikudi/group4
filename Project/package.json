@@ -1,10 +1,13 @@
 {
   "urls": [
-    ["projekti.py", "http://localhost:8000/projekti.py"],
+    ["main.py", "http://localhost:8000/main.py"],
     ["lib/fifo.py", "http://localhost:8000/lib/fifo.py"],
     ["lib/piotimer.py", "http://localhost:8000/lib/piotimer.py"],
     ["lib/ssd1306.mpy", "http://localhost:8000/lib/ssd1306.mpy"],
-    ["lib/led.py", "http://localhost:8000/lib/led.py"]
+    ["lib/led.py", "http://localhost:8000/lib/led.py"],
+    ["kubios_mqtt.py", "http://localhost:8000/kubios_mqtt.py"],
+    ["hrv_analyzer.py", "http://localhost:8000/hrv_analyzer.py"],
+    ["display_manager.py", "http://localhost:8000/display_manager.py"]
   ],
   "deps": [],
   "version": "0.1"
