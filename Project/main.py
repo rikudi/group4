@@ -33,7 +33,7 @@ hrv_analyzer = HRVAnalyzer()
 kubios_mqtt = KubiosMQTT(
     "KME751_Group_4", 
     "takapenkinpojat",
-    "192.168.4.253",
+    "192.168.4.57",
     "pbZRUi49X48I56oL1Lq8y8NDjq6rPfzX3AQeNo3a",
     "3pjgjdmamlj759te85icf0lucv",
     "111fqsli1eo7mejcrlffbklvftcnfl4keoadrdv1o45vt9pndlef",
@@ -273,7 +273,7 @@ while True:
                         break
                 
             elif current_selection == 2:  # "KUBIOS"
-                display.show_message(["KUBIOS TEST", "Measuring and analyzing..."])
+                display.show_message(["KUBIOS CLOUD", "Measuring..."])
                 ppi_data = collect_ppi_data()
                 
                 sns, pns = kubios_mqtt.analyze_data(ppi_data)
