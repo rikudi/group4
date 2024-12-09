@@ -109,7 +109,6 @@ def measure_hr():
 
     disp_div = samplerate / 25
     disp_count = 0
-    capture_length = samplerate * 60  # 60 = 60s, changable respectively
 
     index = 0
     capture_count = 0
@@ -134,7 +133,7 @@ def measure_hr():
 
     graph_points = []
 
-    while capture_count < capture_length:
+    while True:
         if not samples.empty():
             x = samples.get()
             disp_count += 1
