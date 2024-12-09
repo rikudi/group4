@@ -2,7 +2,7 @@ class HRVAnalyzer:
     @staticmethod
     def meanPPI_calculator(data):
         """
-        Calculates the mean PPI (Pulse-to-Pulse Interval) from the given data.
+        Calculates the mean PPI (Peak-to-Peak Interval) from the given data.
         """
         sumPPI = sum(data)
         return int(round(sumPPI / len(data), 0))
@@ -22,3 +22,9 @@ class HRVAnalyzer:
         """
         summary = sum((data[i + 1] - data[i]) ** 2 for i in range(len(data) - 1))
         return int(round((summary / (len(data) - 1)) ** 0.5, 0))
+
+    def meanHR_calculator(self, mean_ppi):
+        """
+        Calculate the mean heart rate (HR) from the mean PPI.
+        """
+        return round(60 * 1000 / mean_ppi, 0)
