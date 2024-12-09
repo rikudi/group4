@@ -250,26 +250,42 @@ while True:
                 mean_ppi = hrv_analyzer.meanPPI_calculator(ppi_data)
                 sdnn = hrv_analyzer.SDNN_calculator(ppi_data, mean_ppi)
                 rmssd = hrv_analyzer.RMSSD_calculator(ppi_data)
+                mean_hr = hrv_analyzer.meanHR_calculator(mean_ppi)
                 
+                history.append(f"Mean PPI: {mean_ppi} ms")
+                history.append(f"Mean HR: {mean_hr} bpm")
                 history.append(f"SDNN: {sdnn} ms")
                 history.append(f"RMSSD: {rmssd} ms")
                 if len(history) > max_history:
                     history.pop(0)
                 
-                display.show_message(["HRV ANALYSIS:", f"SDNN: {sdnn} ms", f"RMSSD: {rmssd} ms"])
-                time.sleep(2)
+                display.show_message([
+                    "HRV ANALYSIS:",
+                    f"Mean PPI: {mean_ppi} ms",
+                    f"Mean HR: {mean_hr} bpm",
+                    f"SDNN: {sdnn} ms",
+                    f"RMSSD: {rmssd} ms"
+                ])
+                
+                # Wait for button press to continue
+                while True:
+                    if not samples.empty() and samples.get() == 2:
+                        break
                 
             elif current_selection == 2:  # "KUBIOS"
-                display.show_message(["KUBIOS TEST", "Sending..."])
+                display.show_message(["KUBIOS TEST", "Measuring and analyzing..."])
                 ppi_data = collect_ppi_data()
                 
                 sns, pns = kubios_mqtt.analyze_data(ppi_data)
-                
                 if sns is not None and pns is not None:
                     display.show_message(["Results:", f"SNS: {sns}", f"PNS: {pns}"])
                 else:
                     display.show_message(["Request failed"])
-                time.sleep(2)
+                
+                # Wait for button press to continue
+                while True:
+                    if not samples.empty() and samples.get() == 2:
+                        break
                 
             elif current_selection == 3:  # "HISTORY"
                 display.display_history(history)
